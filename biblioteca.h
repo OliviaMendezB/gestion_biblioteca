@@ -30,23 +30,21 @@ public:
 typedef tLibro* tPtrLibro;
 
 class tBiblioteca {
-public:
-    tPtrLibro libros[MAX_LIBROS];
-    int cont;
+    private:
+        tPtrLibro libros[MAX_LIBROS];
+        int cont;
+        unordered_map<int, int> indiceISBN;
 
-    unordered_map<int, int> indiceISBN;
+    public:
+        tBiblioteca();
+        ~tBiblioteca();
+        void cargarBiblioteca(ifstream& archivo);
+        void guardarBiblioteca(const string& nombreArchivo) const;
+    
+        void mostrarBiblioteca() const;
+        void mostrarRanking() const;
 
-    tBiblioteca();
+        tPtrLibro getLibro(int isbn) const;
 };
-
-void cargarBiblioteca(tBiblioteca& biblioteca, ifstream& archivo);
-void mostrarBiblioteca(const tBiblioteca& biblioteca);
-tPtrLibro getLibro(const tBiblioteca& biblioteca, int isbn);
-int getNumExistentes(tPtrLibro ptr_libro);
-int getNumPrestados(tPtrLibro ptr_libro);
-void setNumPrestados(tPtrLibro ptr_libro, int num_prestados);
-void liberarBiblioteca(tBiblioteca& biblioteca);
-void guardarBiblioteca(const tBiblioteca& biblioteca, const string& nombreArchivo);
-void mostrarRanking(const tBiblioteca& biblioteca);
 
 #endif

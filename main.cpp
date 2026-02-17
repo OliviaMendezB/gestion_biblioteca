@@ -19,7 +19,7 @@ int main() {
         return 1;
     }
 
-    cargarBiblioteca(biblioteca, archivo);
+    biblioteca.cargarBiblioteca(archivo);
     archivo.close();
 
     int opcion = 0;
@@ -34,20 +34,17 @@ int main() {
         else if (opcion == 2)
             procesarOpcion2(biblioteca, prestamos);
         else if (opcion == 3)
-            mostrarBiblioteca(biblioteca);
+            biblioteca.mostrarBiblioteca();
         else if (opcion == 4)
-            mostrarPrestamos(prestamos);
+            prestamos.mostrarPrestamos();
         else if (opcion == 5)
-            mostrarRanking(biblioteca);
+            biblioteca.mostrarRanking();
         else if (opcion != 6)
             cout << "Opcion invalida.\n";
 
-        guardarBiblioteca(biblioteca, "biblioteca.txt");
+        biblioteca.guardarBiblioteca("biblioteca.txt");
     }
     if (opcion == 6) return 1;
-
-    liberarBiblioteca(biblioteca);
-    liberarPrestamos(prestamos);
 
     return 0;
 }
@@ -58,7 +55,7 @@ void procesarOpcion1(tBiblioteca& biblioteca, tPrestamos& prestamos) {
     cout << "Ingrese ISBN del libro a prestar: ";
     cin >> isbn;
 
-    tPtrLibro libro = getLibro(biblioteca, isbn);
+    tPtrLibro libro = biblioteca.getLibro(isbn);
 
     if (!libro) {
         cout << "Libro no existe en la biblioteca.\n";
@@ -76,7 +73,7 @@ void procesarOpcion1(tBiblioteca& biblioteca, tPrestamos& prestamos) {
 
     tPrestamo prestamo(dni, isbn);
 
-    if (insertarOrdenadoPrestamo(prestamos, prestamo)) {
+    if (prestamos.insertarOrdenadoPrestamo(prestamo)) {
         libro->setNumPrestados(libro->getNumPrestados() + 1);
         cout << "Prestamo realizado con exito.\n";
     }
@@ -96,9 +93,8 @@ void procesarOpcion2(tBiblioteca& biblioteca, tPrestamos& prestamos) {
 
     tPrestamo prestamo(dni, isbn);
 
-    if (eliminarPrestamo(prestamos, prestamo)) {
-
-        tPtrLibro libro = getLibro(biblioteca, isbn);
+    if (prestamos.eliminarPrestamo(prestamo)) {
+        tPtrLibro libro = biblioteca.getLibro(isbn);
         if (libro)
             libro->setNumPrestados(libro->getNumPrestados() - 1);
 

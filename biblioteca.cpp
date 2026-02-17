@@ -21,13 +21,22 @@ tBiblioteca::tBiblioteca() {
         libros[i] = nullptr;
 }
 
-void cargarBiblioteca(tBiblioteca& biblioteca, ifstream& archivo) {
+tBiblioteca::~tBiblioteca() {
+    for (int i = 0; i < cont; i++) {
+        delete libros[i];
+        libros[i] = nullptr;
+    }
+    cont = 0;
+    indiceISBN.clear();
+}
+
+void tBiblioteca::cargarBiblioteca(ifstream& archivo) {
 
     int n;
     archivo >> n;
     archivo.ignore();
 
-    biblioteca.cont = n;
+    cont = n;
 
     for (int i = 0; i < n; i++) {
 
@@ -41,78 +50,54 @@ void cargarBiblioteca(tBiblioteca& biblioteca, ifstream& archivo) {
         archivo >> prestados;
         archivo.ignore();
 
-        biblioteca.libros[i] = new tLibro(isbn, titulo, ejemplares, prestados);
-        biblioteca.indiceISBN[isbn] = i;
+        libros[i] = new tLibro(isbn, titulo, ejemplares, prestados);
+        indiceISBN[isbn] = i;
     }
 }
 
-void mostrarBiblioteca(const tBiblioteca& biblioteca) {
+void tBiblioteca::mostrarBiblioteca() const {
 
-    for (int i = 0; i < biblioteca.cont; i++) {
-        cout << biblioteca.libros[i]->getISBN() << "\n";
-        cout << biblioteca.libros[i]->getTitulo() << "\n";
-        cout << biblioteca.libros[i]->getNumEjemplares() << "\n";
-        cout << biblioteca.libros[i]->getNumPrestados() << "\n";
+    for (int i = 0; i < cont; i++) {
+        cout << libros[i]->getISBN() << "\n";
+        cout << libros[i]->getTitulo() << "\n";
+        cout << libros[i]->getNumEjemplares() << "\n";
+        cout << libros[i]->getNumPrestados() << "\n";
     }
 }
 
-tPtrLibro getLibro(const tBiblioteca& biblioteca, int isbn) {
+tPtrLibro tBiblioteca::getLibro(int isbn) const {
 
-    auto it = biblioteca.indiceISBN.find(isbn);
+    auto it = indiceISBN.find(isbn);
 
-    if (it != biblioteca.indiceISBN.end())
-        return biblioteca.libros[it->second];
+    if (it != indiceISBN.end())
+        return libros[it->second];
 
     return nullptr;
 }
 
-int getNumExistentes(tPtrLibro ptr_libro) {
-    return (ptr_libro != nullptr) ? ptr_libro->getNumEjemplares() : 0;
-}
+void tBiblioteca::guardarBiblioteca(const string& nombreArchivo) const {
 
-int getNumPrestados(tPtrLibro ptr_libro) {
-    return (ptr_libro != nullptr) ? ptr_libro->getNumPrestados() : 0;
-}
+    ofstream archivo(nombreArchivo);
 
-void setNumPrestados(tPtrLibro ptr_libro, int num_prestados) {
-    if (ptr_libro != nullptr)
-        ptr_libro->setNumPrestados(num_prestados);
-}
+    archivo << cont << "\n";
 
-void liberarBiblioteca(tBiblioteca& biblioteca) {
+    for (int i = 0; i < cont; i++) {
 
-    for (int i = 0; i < biblioteca.cont; i++) {
-        delete biblioteca.libros[i];
-        biblioteca.libros[i] = nullptr;
-    }
-
-    biblioteca.cont = 0;
-    biblioteca.indiceISBN.clear();
-}
-
-void guardarBiblioteca(const tBiblioteca& biblioteca, const std::string& nombreArchivo) {
-
-    std::ofstream archivo(nombreArchivo);
-
-    archivo << biblioteca.cont << "\n";
-
-    for (int i = 0; i < biblioteca.cont; i++) {
-
-        archivo << biblioteca.libros[i]->getISBN() << "\n";
-        archivo << biblioteca.libros[i]->getTitulo() << "\n";
-        archivo << biblioteca.libros[i]->getNumEjemplares() << "\n";
-        archivo << biblioteca.libros[i]->getNumPrestados() << "\n";
+        archivo << libros[i]->getISBN() << "\n";
+        archivo << libros[i]->getTitulo() << "\n";
+        archivo << libros[i]->getNumEjemplares() << "\n";
+        archivo << libros[i]->getNumPrestados() << "\n";
     }
 
     archivo.close();
 }
 
-void mostrarRanking(const tBiblioteca& biblioteca) {
+void tBiblioteca::mostrarRanking() const {
 
     vector<tPtrLibro> copia;
 
-    for (int i = 0; i < biblioteca.cont; i++)
-        copia.push_back(biblioteca.libros[i]);
+    for (int i = 0; i < cont; i++)
+        copia.push_back(libros[i]);
 
     sort(copia.begin(), copia.end(),
         [](tPtrLibro a, tPtrLibro b) {

@@ -19,18 +19,20 @@ public:
 };
 
 class tPrestamos {
-public:
-    tPrestamo* prestamos;
-    int cont;
-    int tam;
+    private:
+        tPrestamo* prestamos;
+        int cont;
+        int tam;
 
-    tPrestamos();
-    ~tPrestamos();
+        void redimensionar();
+        bool existePrestamo(const tPrestamo& prestamo, int& pos) const;
+
+    public:
+        tPrestamos();
+        ~tPrestamos();
+
+        bool insertarOrdenadoPrestamo(const tPrestamo& prestamo);
+        bool eliminarPrestamo(const tPrestamo& prestamo);
+        void mostrarPrestamos() const;
 };
-
-bool insertarOrdenadoPrestamo(tPrestamos& prestamos, const tPrestamo& prestamo);
-bool eliminarPrestamo(tPrestamos& prestamos, const tPrestamo& prestamo);
-void mostrarPrestamos(const tPrestamos& prestamos);
-void liberarPrestamos(tPrestamos& prestamos);
-
 #endif

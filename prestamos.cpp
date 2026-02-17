@@ -15,42 +15,50 @@ tPrestamos::tPrestamos() {
 
 tPrestamos::~tPrestamos() {
     delete[] prestamos;
+    prestamos = nullptr;
+    cont = 0;
+    tam = 0;
 }
 
-bool insertarOrdenadoPrestamo(tPrestamos& p, const tPrestamo& prestamo) {
+void tPrestamos::redimensionar() {
+    int newSize = 2 * tam;
+    tPrestamo* vaux = new tPrestamo[newSize];
 
-    for (int i = 0; i < p.cont; i++)
-        if (p.prestamos[i].getDni() == prestamo.getDni() &&
-            p.prestamos[i].getIsbn() == prestamo.getIsbn())
-            return false;
-
-    if (p.cont == p.tam) {
-        int newTam = p.tam + INCR_TAM;
-        tPrestamo* nuevo = new tPrestamo[newTam];
-
-        for (int i = 0; i < p.cont; i++)
-            nuevo[i] = p.prestamos[i];
-
-        delete[] p.prestamos;
-        p.prestamos = nuevo;
-        p.tam = newTam;
+    for (int i = 0; i < cont; i++) {
+        vaux[i] = prestamos[i];
     }
 
-    p.prestamos[p.cont++] = prestamo;
+    tam = newSize;
+    delete[] prestamos;
+    prestamos = vaux;
+}
+
+bool tPrestamos::insertarOrdenadoPrestamo(const tPrestamo& prestamo) {
+    int pos;
+    if (existePrestamo(prestamo, pos)) return false; 
+
+    if (cont == tam) redimensionar();
+
+    for (int i = cont; i > pos; i--) {
+        prestamos[i] = prestamos[i - 1];
+    }
+    prestamos[pos] = prestamo;
+    cont++;
     return true;
 }
 
-bool eliminarPrestamo(tPrestamos& p, const tPrestamo& prestamo) {
 
-    for (int i = 0; i < p.cont; i++) {
+bool tPrestamos::eliminarPrestamo(const tPrestamo& prestamo) {
 
-        if (p.prestamos[i].getDni() == prestamo.getDni() &&
-            p.prestamos[i].getIsbn() == prestamo.getIsbn()) {
+    for (int i = 0; i < cont; i++) {
 
-            for (int j = i; j < p.cont - 1; j++)
-                p.prestamos[j] = p.prestamos[j + 1];
+        if (prestamos[i].getDni() == prestamo.getDni() &&
+            prestamos[i].getIsbn() == prestamo.getIsbn()) {
 
-            p.cont--;
+            for (int j = i; j < cont - 1; j++)
+                prestamos[j] = prestamos[j + 1];
+
+            cont--;
             return true;
         }
     }
@@ -58,15 +66,25 @@ bool eliminarPrestamo(tPrestamos& p, const tPrestamo& prestamo) {
     return false;
 }
 
-void mostrarPrestamos(const tPrestamos& p) {
-
-    for (int i = 0; i < p.cont; i++)
-        cout << "DNI: " << p.prestamos[i].getDni()
-        << " ISBN: " << p.prestamos[i].getIsbn() << "\n";
+void tPrestamos::mostrarPrestamos() const{
+    for (int i = 0; i < cont; i++)
+        cout << "DNI: " << prestamos[i].getDni()
+        << " ISBN: " << prestamos[i].getIsbn() << "\n";
 }
 
-void liberarPrestamos(tPrestamos& p) {
-    delete[] p.prestamos;
-    p.cont = 0;
-    p.tam = 0;
+bool tPrestamos::existePrestamo(const tPrestamo& prestamo, int& pos) const {
+    pos = 0;
+    while (pos < cont) {
+        if (prestamos[pos].getDni() == prestamo.getDni()) {
+            if (prestamos[pos].getIsbn() == prestamo.getIsbn())
+                return true; 
+            else if (prestamo.getIsbn() < prestamos[pos].getIsbn())
+                return false; 
+        }
+        else if (prestamo.getDni() < prestamos[pos].getDni()) {
+            return false; 
+        }
+        pos++;
+    }
+    return false;
 }
